@@ -5,7 +5,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+# XXX: Manually set path to script here
+SCRIPT_DIR="/Users/3t4/local/pdf2md/tpdf2md"
 VENV_PYTHON="$SCRIPT_DIR/venv/bin/python3"
 
 if [[ ! -x "$VENV_PYTHON" ]]; then

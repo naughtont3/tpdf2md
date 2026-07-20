@@ -27,6 +27,10 @@ Run without activating the venv yourself:
 regardless of your current shell environment. It accepts the same
 arguments as `tpdf2md` below.
 
+> **Note:** `SCRIPT_DIR` in `tpdf2md.sh` is currently hardcoded to this
+> repo's path rather than resolved automatically, so update it if you
+> move or clone the repo elsewhere.
+
 Print Markdown to stdout:
 
 ```bash
