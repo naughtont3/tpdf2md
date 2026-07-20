@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+from pathlib import Path
+
+import pymupdf4llm
+
+
+def confirm_overwrite(path: Path) -> bool:
+    """Prompt until the user answers yes or no."""
+    while True:
+        try:
+            response = input(
+                f"Output file '{path}' already exists. Overwrite? [y/N] "
+            ).strip().lower()
+        except EOFError:
+            return False
+
+        if response in ("y", "yes"):
+            return True
+
+        if response in ("", "n", "no"):
+            return False
+
+        print("Please answer yes or no.", file=sys.stderr)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Convert a PDF to Markdown."
+    )
+    parser.add_argument(
+        "pdf",
+        type=Path,
+        help="Input PDF file",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        metavar="FILE",
+        help="Write Markdown to FILE instead of stdout",
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Overwrite an existing output file without prompting",
+    )
+    parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help="Prompt before overwriting an existing output file",
+    )
+
+    args = parser.parse_args()
+
+    if args.force and args.interactive:
+        parser.error("--force and --interactive cannot be used together")
+
+    if not args.pdf.is_file():
+        parser.error(f"input file does not exist or is not a file: {args.pdf}")
+
+    if args.output and args.output.exists():
+        if args.output.is_dir():
+            parser.error(f"output path is a directory: {args.output}")
+
+        if args.force:
+            pass
+        elif args.interactive:
+            if not confirm_overwrite(args.output):
+                print("Output not overwritten.", file=sys.stderr)
+                return 1
+        else:
+            parser.error(
+                f"output file already exists: {args.output}; "
+                "use --force to overwrite or --interactive to prompt"
+            )
+
+    try:
+        markdown = pymupdf4llm.to_markdown(str(args.pdf))
+
+        if args.output:
+            args.output.write_text(markdown, encoding="utf-8")
+        else:
+            print(markdown, end="")
+
+    except Exception as exc:
+        print(f"Error converting '{args.pdf}': {exc}", file=sys.stderr)
+        return 2
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
