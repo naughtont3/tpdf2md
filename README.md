@@ -17,6 +17,16 @@ pip install -r requirements.txt
 
 ## Usage
 
+Run without activating the venv yourself:
+
+```bash
+./tpdf2md.sh input.pdf
+```
+
+`tpdf2md.sh` runs `tpdf2md` with the venv's Python directly, so it works
+regardless of your current shell environment. It accepts the same
+arguments as `tpdf2md` below.
+
 Print Markdown to stdout:
 
 ```bash
